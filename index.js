@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
 	});
 	socket.on("disconnecting", () => {
 		for(let s in waitingSockets) {
-			if(waitingSockets[s].socket == socket.id) {
+			if(waitingSockets[s].socket.id == socket.id) {
 				waitingSockets.splice(s, 1);
 				break;
 			}
@@ -51,7 +51,14 @@ io.on('connection', (socket) => {
 
 //#endregion
 
+/**/
 let port = process.env.PORT || 3000;
 server.listen(port, "0.0.0.0", () => {
 	console.log('Server running on port:'+port);
 });
+/*/
+let port = 3000;
+server.listen(port, () => {
+	console.log('Server running on port:'+port);
+});
+/**/
