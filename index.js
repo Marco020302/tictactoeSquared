@@ -19,14 +19,16 @@ let waitingSockets = [];
 io.on('connection', (socket) => {
 	socket.on("newgame", (nick) => {
 		let s2 = waitingSockets.shift();
-		if(s2 != undefined) {
+		if(s2 != undefined && s2.socket.id != socket.id) {
 			let id = socket.id+s2.socket.id;
 			socket.join(id);
 			s2.socket.join(id);
 			socket.emit("start", {yourTurn: 1, nick: s2.nick, id: id});
 			s2.socket.emit("start", {yourTurn: 0, nick: nick, id: id});
-		} else {
+		} else if(s2 == undefined){
 			waitingSockets.push({socket: socket, nick: nick});
+		} else {
+			waitingSockets.unshift(s2);
 		}
 	});
 	socket.on("place", (data) => {
