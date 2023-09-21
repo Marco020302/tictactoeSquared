@@ -324,6 +324,14 @@
 			gameOver(yourTurn);
 		});
 
+
+		document.getElementById("nickname").addEventListener("keyup", (event) => {
+			event.preventDefault();
+			if (event.keyCode === 13) {
+				connect();
+			}
+		});
+
 		function infoOpen() {
 			let info = document.getElementById("info");
 			if(info.classList.contains("infoclose")) {
