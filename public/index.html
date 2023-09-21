@@ -1,0 +1,487 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>(tic tac toe)²</title>
+	<style>
+		:root {
+			font-size: 0.9vmin;
+			--border-width: 0.5rem;
+			--bg: #E6EE9C;
+			--fg1: #D32F2F;
+			--fg2: #0277BD;
+			--bg: #0277BD;
+			--fg1: #E3F2FD;
+			--fg2: #FFCA28;
+			--border: solid var(--fg2);
+		}
+		
+		body {
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+			background-color: var(--bg);
+			color: var(--fg1);
+			font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		}
+		
+		#body {
+			width: 100rem;
+			height: 100rem;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			bottom: 0px;
+			right: 0px;
+			margin: auto;
+			aspect-ratio: 1;
+		}
+
+		.tris {
+			display: grid;
+			position: relative;
+			grid-template-columns: 1fr 1fr 1fr;
+			grid-template-rows: 1fr 1fr 1fr;
+			height: 100%;
+			width: 100%;
+			aspect-ratio: 1;
+			font-family: 'Courier New', Courier, monospace;
+			font-weight: bolder;
+		}
+
+		.cell:nth-child(1) {
+			border-right: var(--border);
+			border-bottom: var(--border);
+		}
+		.cell:nth-child(2) {
+			border-left: var(--border);
+			border-bottom: var(--border);
+			border-right: var(--border);
+		}
+		.cell:nth-child(3) {
+			border-left: var(--border);
+			border-bottom: var(--border);
+		}
+		.cell:nth-child(4) {
+			border-top: var(--border);
+			border-bottom: var(--border);
+			border-right: var(--border);
+		}
+		.cell:nth-child(5) {
+			border-left: var(--border);
+			border-bottom: var(--border);
+			border-right: var(--border);
+			border-top: var(--border);
+		}
+		.cell:nth-child(6) {
+			border-left: var(--border);
+			border-bottom: var(--border);
+			border-top: var(--border);
+		}
+		.cell:nth-child(7) {
+			border-right: var(--border);
+			border-top: var(--border);
+		}
+		.cell:nth-child(8) {
+			border-left: var(--border);
+			border-top: var(--border);
+			border-right: var(--border);
+		}
+		.cell:nth-child(9) {
+			border-left: var(--border);
+			border-top: var(--border);
+		}
+
+		.cell {
+			padding: 5%;
+			box-sizing: border-box;
+		}
+
+		.big .cell .cell {
+			border-width: calc(var(--border-width) / 2);
+			font-size: 10rem;
+		}
+
+		.big .cell {
+			font-size: 30rem;
+			position: relative;
+			border-width: var(--border-width);
+		}
+
+		.val {
+			font-style: inherit;
+			width: fit-content;
+			height: fit-content;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			bottom: 0px;
+			right: 0px;
+			margin: auto;
+		}
+
+		.disabled {
+			background-color: rgba(0, 0, 0, 0.15);
+		}
+
+		#gameover {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.15);
+			font-family: inherit;
+		}
+		
+		#container, #info{
+			position: relative;
+			display: block;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: fit-content;
+			height: fit-content;
+			padding: 5rem;
+			border-radius: 5rem;
+			background-color: var(--bg);
+			border: solid var(--fg1) 1rem;
+		}
+		
+		button {
+			background-color: var(--fg2);
+			color: var(--bg);
+			border-radius: 1em;
+			padding: 0.5em;
+			font-size: 3rem;
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
+			width: fit-content;
+			font-weight: bolder;
+			font-family: inherit;
+			border: none;
+			transition: 0.2s;
+		}
+
+		/* @keyframes hover {
+			0% {transform: translateX(-50%) rotate(0deg);}
+			25% {transform: translateX(-40%) rotate(calc(360deg * 1));}
+			75% {transform: translateX(-60%) rotate(calc(360deg * 3));}
+			100% {transform: translateX(-50%) rotate(calc(360deg * 4));}
+		} */
+
+		button:hover {
+			background-color: var(--fg1);
+			/* animation-name: hover;
+			animation-duration: 1s;
+			animation-timing-function: linear;
+			animation-iteration-count: infinite; */
+			transform: translateX(-50%) scale(1.1);
+			transition: 0.2s;
+		}
+		
+		#container>div {
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
+			color: var(--fg2);
+			font-size: 5rem;
+			width: fit-content;
+			font-weight: bolder;
+			margin-bottom: 5rem;
+		}
+
+		input {
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 80%;
+			height: fit-content;
+			font-size: 4rem;
+			padding: 0.1em;
+			border-radius: 2rem;
+			border: solid var(--fg2) 0.5rem;
+			margin-bottom: 5rem;
+			color: var(--bg);
+			background-color: var(--fg1);
+			text-align: center;
+			font-family: inherit;
+			font-weight: 900;
+			transition: 0.2s;
+		}
+
+		input:hover {
+			background-color: var(--fg2);
+			border-color: var(--fg1);
+			/* animation-name: hover;
+			animation-duration: 1s;
+			animation-timing-function: linear;
+			animation-iteration-count: infinite; */
+			transform: translateX(-50%) scale(1.05);
+			transition: 0.2s;
+		}
+
+		input:disabled {
+			opacity: 0.5;
+			transition: 0.2s;
+		}
+
+		input:disabled:hover {
+			background-color: var(--fg1);
+		}
+
+		#info {
+			font-family: inherit;
+			top: 0px;
+			transform: translate(-50%);
+			padding: 2rem;
+			font-size: 3rem;
+			border-width: 0.5rem;
+			display: flex;
+			transition: 1s;
+		}
+		
+		#content {
+			position: relative;
+			margin: 0px;
+			display: inline;
+		}
+		
+		.close {
+			position: relative;
+			font-size: 2rem;
+			padding: 0px;
+			width: 3rem;
+			height: 3rem;
+			text-align: center;
+			margin: 0px;
+			top:auto;
+			left: auto;
+			transform: none;
+			margin-left: 2rem;
+		}
+
+		.close:hover {
+			transform: scale(1.1);
+		}
+
+		.close span {
+			position: absolute;
+			top:0px;
+			left:0px;
+			bottom:0px;
+			right:0px;
+			margin: auto;
+			width: fit-content;
+			height: fit-content;
+		}
+
+		#info.infoclose {
+			transform: translate(-50%, -100%);
+			transition: 0.5s ease-out;
+		}
+	</style>
+</head>
+<body>
+	<div id="body"></div>
+	<div id="gameover"><div id="container"><div id="wonBy">Welcome to (tic tac toe)²</div><input type="text" id="nickname" placeholder="Nickname" maxlength="16"><button onclick="connect();">New Game</button></div></div>
+	<div id="info" class="infoclose"><p id="content">You're against <span id="enemyNick"></span></p><button class="close" onclick="infoClose();"><span>X</span></button></div>
+</body>
+<footer>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		let yourTurn = 0;
+		let enemyNick = "";
+		let myNick = "";
+		let connectionID = "";
+		let mainTris = null;
+		let socket = io();
+
+		socket.on("start", (data) => {
+			yourTurn = data.yourTurn;
+			enemyNick = data.nick;
+			connectionID = data.id;
+			document.getElementById("enemyNick").innerText = enemyNick;
+			infoOpen();
+			setTimeout(infoClose, 7000);
+			reset();
+		});
+
+		socket.on("place", (data) => {
+			if(data.turn != yourTurn && data.turn == mainTris.turn) {
+				placeFromEnemy(mainTris, data.trisID, data.cellID);
+			}
+		});
+
+		socket.on("won", () => {
+			gameOver(yourTurn);
+		});
+
+		function infoOpen() {
+			let info = document.getElementById("info");
+			if(info.classList.contains("infoclose")) {
+				info.classList.remove("infoclose");
+			}
+		}
+		
+		function infoClose() {
+			let info = document.getElementById("info");
+			if(!info.classList.contains("infoclose")) {
+				info.classList.add("infoclose");
+			}
+		}
+
+		function connect() {
+			myNick = document.getElementById("nickname").value;
+			document.getElementById("nickname").disabled = true;
+			document.getElementById("wonBy").innerText = "Waiting for a player...";
+			socket.emit("newgame", myNick);
+		}
+
+		function reset() {
+			let div = document.getElementById("body");
+			try {
+				div.removeChild(div.firstChild);
+			} catch {}
+			mainTris = init();
+			div.appendChild(mainTris);
+			document.getElementById("gameover").style.display = "none";
+		}
+
+		function gameOver(wonBy) {
+			switch(wonBy) {
+				case 0:
+				case 1:
+					document.getElementById("wonBy").innerText = "Player "+(wonBy==yourTurn?myNick:enemyNick)+" WON!!!";
+					break;
+				case 2:
+					document.getElementById("wonBy").innerText = "That's a TIE!!!";
+					break;
+			}
+			document.getElementById("nickname").disabled = true;
+			document.getElementById("gameover").style.display = "block";
+		}
+
+		function getSymbol(player) {
+			if (player == 0) return '<span class="val">X</span>';
+			if (player == 1) return '<span class="val">O</span>';
+			if (player == 2) return '<span class="val">-</span>';
+			return '<span class="val"></span>';
+		}
+
+
+
+		function placeFromEnemy(trisBig, trisID, cellID) {
+			if(yourTurn != trisBig.turn) {
+				placeGiveneIDs(trisBig, trisID, cellID);
+			}
+		}
+
+		function placeFromClick(trisBig, tris, cell) {
+			if(yourTurn == trisBig.turn) {
+				place(trisBig, tris, cell);
+				socket.emit("place", {id: connectionID, turn: yourTurn, trisID: tris.trisID, cellID: cell.cellID});
+			}
+		}
+
+		function placeGiveneIDs(trisBig, trisID, cellID) {
+			place(trisBig, trisBig.cellList[trisID], trisBig.cellList[trisID].cellList[cellID]);
+		}
+
+		function place(trisBig, tris, cell)
+		{
+			if(!tris.isEnabled() || tris.full || cell.wonBy != null) return;
+			cell.wonBy = trisBig.turn;
+			cell.innerHTML = getSymbol(trisBig.turn);
+			trisBig.turn = 1 - trisBig.turn;
+			let won = checkTris(tris);
+			if(won != null) {
+				tris.innerHTML = "";
+				tris.innerHTML = getSymbol(won);
+				tris.full = true;
+				tris.wonBy = won;
+				tris.classList.add("disabled");
+				won = checkTris(trisBig);
+				if(won != null) {
+					gameOver(won);
+				}
+			}
+			enableTris(trisBig, cell.cellID);
+		}
+
+		function checkTris(tris)
+		{
+			let full = 2;
+			let diag1 = tris.cellList[0].wonBy;
+			let diag2 = tris.cellList[2].wonBy;
+			for(let i = 0; i < 3; i++) {
+				let rowWonBy = tris.cellList[i*3].wonBy;
+				let colWonBy = tris.cellList[i].wonBy;
+				if(diag1 != tris.cellList[i*3+i].wonBy) diag1 = null;
+				if(diag2 != tris.cellList[i*3+2-i].wonBy) diag2 = null;
+				if(tris.cellList[i*3].wonBy == null) full = null;
+				for(let j = 1; j < 3; j++) {
+					if(rowWonBy != tris.cellList[i*3+j].wonBy) rowWonBy = null;
+					if(colWonBy != tris.cellList[j*3+i].wonBy) colWonBy = null;
+					if(tris.cellList[i*3+j].wonBy == null) full = null;
+				}
+				if (rowWonBy != null) return rowWonBy;
+				if (colWonBy != null) return colWonBy;
+			}
+			if (diag1 != null) return diag1;
+			if (diag2 != null) return diag2;
+			if (full != null) return full;
+			return null;
+		}
+
+		function enableTris(trisBig, trisID)
+		{
+			for(let tris of trisBig.cellList) {
+				tris.classList.add("disabled");
+				if(tris.trisID == trisID) {
+					if(tris.full) {
+						for(let t2 of trisBig.cellList) {
+							if(!t2.full && !tris.isEnabled()) t2.classList.remove("disabled");							
+						}
+						break;
+					} else if (!tris.isEnabled()){
+						tris.classList.remove("disabled");
+					}
+				}
+			}
+		}
+
+		function init()
+		{
+			let trisBig = document.createElement("div");
+			trisBig.classList.add("tris");
+			trisBig.classList.add("big");
+			trisBig.turn = 0;
+			trisBig.cellList = [];
+			for(let i = 0; i < 9; i++) {
+				let tris = document.createElement("div");
+				tris.classList.add("tris");
+				tris.classList.add("cell");
+				tris.trisID = i;
+				tris.enabled = true;
+				tris.isEnabled = () => {return !tris.classList.contains("disabled")};
+				tris.full = false;
+				tris.wonBy = null;
+				tris.cellList = [];
+				for(let j = 0; j < 9; j++) {
+					let cell = document.createElement("div");
+					cell.classList.add("cell");
+					cell.cellID = j;
+					cell.innerHTML = "";
+					cell.wonBy = null;
+					cell.onclick = () => placeFromClick(trisBig, tris, cell);
+					tris.cellList.push(cell);
+					tris.appendChild(cell);
+				}
+				trisBig.cellList.push(tris);
+				trisBig.appendChild(tris);
+			}
+			return trisBig;
+		}
+	</script>
+</footer>
+</html>
