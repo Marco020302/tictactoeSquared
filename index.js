@@ -52,6 +52,6 @@ io.on('connection', (socket) => {
 //#endregion
 
 
-server.listen(2302, () => {
-	console.log('server running at http://localhost:2302');
+server.listen(80, () => {
+	console.log('server running at http://localhost:80');
 });
