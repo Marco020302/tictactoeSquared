@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
 
 //#endregion
 
-
-server.listen(80, () => {
-	console.log('server running at http://localhost:80');
+let port = process.env.PORT || 3000;
+server.listen(port, "0.0.0.0", () => {
+	console.log('Server running on port:'+port);
 });
