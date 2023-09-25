@@ -32,6 +32,12 @@
 			right: 0px;
 			margin: auto;
 			aspect-ratio: 1;
+			transition: 0.2s;
+		}
+
+		.otherTurn {
+			opacity: 0.5;
+			transition: 0.2s;
 		}
 
 		.tris {
@@ -364,6 +370,7 @@
 			yourTurn = data.yourTurn;
 			enemyNick = data.nick;
 			connectionID = data.id;
+			document.getElementById("body").classList.remove("otherTurn");
 			document.getElementById("enemyNick").innerText = enemyNick;
 			infoOpen();
 			setTimeout(infoClose, 7000);
@@ -433,6 +440,11 @@
 			mainTris = init();
 			div.appendChild(mainTris);
 			document.getElementById("gameover").style.display = "none";
+			if(yourTurn == mainTris.turn) {
+				document.getElementById("body").classList.remove("otherTurn");
+			} else {
+				document.getElementById("body").classList.add("otherTurn");
+			}
 		}
 
 		function gameOver(wonBy) {
@@ -466,13 +478,15 @@
 		function placeFromEnemy(trisBig, trisID, cellID) {
 			if(yourTurn != trisBig.turn) {
 				placeGiveneIDs(trisBig, trisID, cellID);
+				document.getElementById("body").classList.remove("otherTurn");
 			}
 		}
-
+		
 		function placeFromClick(trisBig, tris, cell) {
 			if(yourTurn == trisBig.turn) {
 				place(trisBig, tris, cell);
 				socket.emit("place", {id: connectionID, turn: yourTurn, trisID: tris.trisID, cellID: cell.cellID});
+				document.getElementById("body").classList.add("otherTurn");
 			}
 		}
 
