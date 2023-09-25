@@ -6,9 +6,6 @@
 		:root {
 			font-size: 0.9vmin;
 			--border-width: 0.5rem;
-			--bg: #E6EE9C;
-			--fg1: #D32F2F;
-			--fg2: #0277BD;
 			--bg: #0277BD;
 			--fg1: #E3F2FD;
 			--fg2: #FFCA28;
@@ -160,6 +157,8 @@
 			font-family: inherit;
 			border: none;
 			transition: 0.2s;
+			display: block;
+			margin-top: 2rem;
 		}
 
 		/* @keyframes hover {
@@ -188,9 +187,10 @@
 			width: fit-content;
 			font-weight: bolder;
 			margin-bottom: 5rem;
+			text-align: center;
 		}
 
-		input {
+		input[type=text] {
 			position: relative;
 			left: 50%;
 			transform: translateX(-50%);
@@ -200,16 +200,16 @@
 			padding: 0.1em;
 			border-radius: 2rem;
 			border: solid var(--fg2) 0.5rem;
-			margin-bottom: 5rem;
 			color: var(--bg);
 			background-color: var(--fg1);
 			text-align: center;
 			font-family: inherit;
 			font-weight: 900;
 			transition: 0.2s;
+			margin-bottom: 2rem;
 		}
 
-		input:hover {
+		input[type=text]:hover {
 			background-color: var(--fg2);
 			border-color: var(--fg1);
 			/* animation-name: hover;
@@ -220,12 +220,12 @@
 			transition: 0.2s;
 		}
 
-		input:disabled {
+		input[type=text]:disabled {
 			opacity: 0.5;
 			transition: 0.2s;
 		}
 
-		input:disabled:hover {
+		input[type=text]:disabled:hover {
 			background-color: var(--fg1);
 		}
 
@@ -260,10 +260,11 @@
 			margin-left: 2rem;
 		}
 
-		.close:hover {
+		.close:hover, input[type=color]:hover{
 			transform: scale(1.1);
+			transition: 0.2s;
 		}
-
+		
 		.close span {
 			position: absolute;
 			top:0px;
@@ -280,29 +281,84 @@
 			transition: 0.5s ease-out;
 		}
 
-		#btn:disabled {
+		button:disabled {
 			opacity: 0.5;
 			transition: 0.2s;
 		}
-		#btn:disabled:hover {
+		button:disabled:hover {
 			background-color: var(--fg2);
+		}
+
+		input[type=color] {
+			background-color: white;
+			border-color: var(--fg2);
+			transition: 0.2s;
+			display: inline-block;
+			margin-right: 1rem;
+			margin-left: 1rem;
+		}
+		
+		#colorPick {
+			margin-top: 2rem;
+			margin-bottom: 0rem;
+		}
+		
+		input::placeholder {
+			color: var(--bg);
+			opacity: 0.5;
 		}
 	</style>
 </head>
 <body>
 	<div id="body"></div>
-	<div id="gameover"><div id="container"><div id="wonBy">Welcome to (tic tac toe)²</div><input type="text" id="nickname" placeholder="Nickname" maxlength="16"><button onclick="connect();" id="btn">New Game</button></div></div>
-	<div id="info" class="infoclose"><p id="content">You're against <span id="enemyNick"></span></p><button class="close" onclick="infoClose();"><span>X</span></button></div>
+	<div id="gameover">
+		<div id="container">
+			<div id="wonBy">Welcome to (tic tac toe)²</div>
+			<input type="text" id="nickname" placeholder="Nickname" maxlength="16">
+			<button onclick="connect();" id="btn">New Game</button>
+			<button onclick="generateLink();" id="link">Play with a friend</button>
+			<div id="colorPick">
+			</div>
+		</div>
+	</div>
+	<div id="info" class="infoclose">
+		<p id="content">You're against <span id="enemyNick"></span></p>
+		<button class="close" onclick="infoClose();"><span>X</span></button>
+	</div>
 </body>
 <footer>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		let root = document.querySelector(":root");
+		let colors = ["bg", "fg1", "fg2"]
+
+		for (const color of colors) {
+			let input = document.createElement("input");
+			input.type = "color";
+			input.value = getComputedStyle(root).getPropertyValue("--"+color);
+			input.onchange = () => {
+				root.style.setProperty("--"+color, input.value);
+			}
+			document.getElementById("colorPick").appendChild(input);
+		}
+
+
+
+
 		let yourTurn = 0;
 		let enemyNick = "";
 		let myNick = "";
 		let connectionID = "";
 		let mainTris = null;
 		let socket = io();
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		let enemyLink = urlParams.get("enemy");
+		if( enemyLink != null) {
+			document.getElementById("btn").disabled = true;
+		}
+		window.history.pushState({"pageTitle":window.document.title},"", window.location.protocol+"//"+window.location.host);
+
 
 		socket.on("start", (data) => {
 			yourTurn = data.yourTurn;
@@ -346,10 +402,25 @@
 			}
 		}
 
+		function generateLink() {
+			myNick = document.getElementById("nickname").value;
+			document.getElementById("nickname").disabled = true;
+			document.getElementById("btn").disabled = true;
+			document.getElementById("link").disabled = true;
+			if(enemyLink != null) {
+				socket.emit("invited", {nick: myNick, id: enemyLink});
+				document.getElementById("wonBy").innerText = "Waiting for the Friend...";
+			} else {
+				socket.emit("invite", myNick);
+				document.getElementById("wonBy").innerText = "Invite a Frind with this link:\n"+window.location.protocol+"//"+window.location.host+"?enemy="+socket.id;
+			}
+		}
+		
 		function connect() {
 			myNick = document.getElementById("nickname").value;
 			document.getElementById("nickname").disabled = true;
 			document.getElementById("btn").disabled = true;
+			document.getElementById("link").disabled = true;
 			document.getElementById("wonBy").innerText = "Waiting for a player...";
 			socket.emit("newgame", myNick);
 		}
@@ -365,6 +436,9 @@
 		}
 
 		function gameOver(wonBy) {
+			if(enemyLink != null) {
+				enemyLink = null;
+			}
 			switch(wonBy) {
 				case 0:
 				case 1:
@@ -376,6 +450,7 @@
 			}
 			document.getElementById("nickname").disabled = false;
 			document.getElementById("btn").disabled = false;
+			document.getElementById("link").disabled = false;
 			document.getElementById("gameover").style.display = "block";
 		}
 
